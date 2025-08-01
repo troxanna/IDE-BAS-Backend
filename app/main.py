@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.api.v1 import router as v1_router
+from app.middleware import upload_size_limit as UploadSizeLimitMiddleware
 
 app = FastAPI(
     title="Markdown Upload API",
