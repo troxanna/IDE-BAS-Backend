@@ -1,0 +1,12 @@
+uvicorn[standard]
+fastapi
+boto3>=1.26.0
+sqlalchemy
+psycopg[binary]
+python-dotenv
+alembic
+pytest
+httpx
+pytest-asyncio
+fastapi-users
+celery
