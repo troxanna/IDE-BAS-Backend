@@ -22,7 +22,7 @@ services:
       /bin/sh -c "
       sleep 5 &&
       mc alias set local http://minio:9000 minio minio123 &&
-      mc mb -p local/markdown-files-uploads || true &&
+      mc mb -p local/files-uploads || true &&
       echo '✅ Bucket created'
       "
   python:
