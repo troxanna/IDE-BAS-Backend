@@ -1,31 +1,31 @@
 from fastapi import APIRouter, File, UploadFile, HTTPException, Depends, Form, Query
 from app.services.s3_service import upload_file_to_s3
 from app.core.security import get_current_user
+from app.core.config import MINIO_ENDPOINT
 from app.models.user import User
-from app.models.project import Project
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.db.repository.project import get_or_create_project, get_user_project_by_name
-from app.db.repository.file import create_file
+from app.db.repository.file import create_file, get_user_files_by_project_name
 from typing import List, Optional
-from app.db.repository.file import get_user_files_by_project_name
 
 router = APIRouter()
 
 @router.post("/")
-async def upload_md_file(file: UploadFile = File(...),
-                          project_name: str = Form(...), 
-                          db: AsyncSession = Depends(get_db),
-                          current_user: User = Depends(get_current_user)):
+async def upload_md_file(
+    file: UploadFile = File(...),
+    project_name: str = Form(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     if file.content_type != "text/markdown" and not file.filename.endswith(".md"):
         raise HTTPException(status_code=400, detail="Invalid file type. Please upload a Markdown (.md) file.")
 
     project = await get_or_create_project(db, project_name, current_user.id)
-    # Задаем имя бакета
     bucket_name = "files-uploads"
-    # Передача файла в S3
     try:
         await upload_file_to_s3(file.file, bucket_name, file.filename)
+        public_url = f"{MINIO_ENDPOINT}/{bucket_name}/{file.filename}"
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error uploading to S3: {e}")
 
@@ -36,14 +36,15 @@ async def upload_md_file(file: UploadFile = File(...),
         bucket=bucket_name,
         content_type=file.content_type,
         project_id=project.id,
-    )   
+        public_url=public_url,
+    )
 
     return {
         "filename": new_file.filename,
         "project": project.name,
-        "message": "File and project saved successfully"
+        "public_url": new_file.public_url,
+        "message": "File and project saved successfully",
     }
-
 
 
 @router.get("/", response_model=List[str])
