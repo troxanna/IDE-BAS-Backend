@@ -10,3 +10,8 @@ httpx
 pytest-asyncio
 fastapi-users
 celery
+authlib
+python-jose
+asyncpg
+itsdangerous
+greenlet
