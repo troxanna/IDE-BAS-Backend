@@ -7,6 +7,7 @@ from app.models.user import User  # подкорректируй путь, ес�
 from app.db.session import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import JWT_SECRET, TEST_AUTH_TOKEN, TEST_USER_ID
+from app.db.repository.user import get_user_by_id
 
 JWT_ALGORITHM = "HS256"
 
@@ -28,13 +29,11 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    from app.db.repository.user import get_user_by_id  # импорт функции получения юзера
-
     # Разрешаем использование статичного токена для тестирования
     if TEST_AUTH_TOKEN and token == TEST_AUTH_TOKEN:
         if not TEST_USER_ID:
             raise credentials_exception
-        user = await get_user_by_id(db, int(TEST_USER_ID))
+        user = await get_user_by_id(db, TEST_USER_ID)
         if user is None:
             raise credentials_exception
         return user
