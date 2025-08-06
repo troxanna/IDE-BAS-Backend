@@ -20,7 +20,7 @@ async def auth_callback(request: Request, db=Depends(get_db)):
         raise HTTPException(status_code=400, detail="Failed to retrieve access token")
 
     try:
-        resp = await oauth.google.get("https://www.googleapis.com/oauth2/v3/userinfo", token=token)
+        resp = await oauth.google.get("userinfo", token=token)
         user_info = resp.json()
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to fetch user info: {str(e)}")
