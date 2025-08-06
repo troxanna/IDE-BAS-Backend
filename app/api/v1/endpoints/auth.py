@@ -19,13 +19,15 @@ async def auth_callback(request: Request, db=Depends(get_db)):
     if not token:
         raise HTTPException(status_code=400, detail="Failed to retrieve access token")
 
-    try:
-        resp = await oauth.google.get("userinfo", token=token)
-        user_info = resp.json()
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to fetch user info: {str(e)}")
+    user_info = token.get("userinfo")
+    if not user_info:
+        raise HTTPException(status_code=400, detail="User info not found in token")
 
     user = await get_or_create_user(db, user_info)
     jwt_token = create_jwt_token(user.id)
+
+    # Когда будет фронт:
+    # redirect_url = f"FRONTEND_REDIRECT_URI/auth/success?token={jwt_token}"
+    # return RedirectResponse(url=redirect_url)
 
     return JSONResponse(content={"access_token": jwt_token})
