@@ -27,7 +27,7 @@ async def auth_callback(request: Request, db=Depends(get_db)):
     jwt_token = create_jwt_token(user.id)
 
     # Когда будет фронт:
-    # redirect_url = f"FRONTEND_REDIRECT_URI/auth/success?token={jwt_token}"
+    # redirect_url = f"FRONTEND_REDIRECT_URI/auth/callback?token={jwt_token}"
     # return RedirectResponse(url=redirect_url)
 
     return JSONResponse(content={"access_token": jwt_token})
