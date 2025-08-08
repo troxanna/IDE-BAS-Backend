@@ -22,6 +22,7 @@ async def upload_md_file(
         raise HTTPException(status_code=400, detail="Invalid file type. Please upload a Markdown (.md) file.")
 
     project = await get_or_create_project(db, project_name, current_user.id)
+    project_name_value = project.name
     bucket_name = "files-uploads"
     try:
         await upload_file_to_s3(file.file, "files-uploads", file.filename, content_type=file.content_type)
@@ -29,6 +30,7 @@ async def upload_md_file(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error uploading to S3: {e}")
 
+    
     new_file = await create_file(
         db,
         filename=file.filename,
@@ -41,7 +43,7 @@ async def upload_md_file(
 
     return {
         "filename": new_file.filename,
-        "project": project.name,
+        "project": project_name_value,
         "public_url": new_file.public_url,
         "message": "File and project saved successfully",
     }

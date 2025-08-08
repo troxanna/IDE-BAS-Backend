@@ -25,7 +25,7 @@ async def upload_file_to_s3(file_obj, bucket_name: str, object_name: str, conten
     file_obj.seek(0)  # важно!
     extra = {}
     if content_type:
-     extra["ContentType"] = content_type
+        extra["ContentType"] = content_type
     def _do_upload():
         s3_client.upload_fileobj(file_obj, bucket_name, object_name, ExtraArgs=extra)
     # boto3 — блокирующий, выносим в поток
