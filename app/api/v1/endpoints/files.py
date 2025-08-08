@@ -38,6 +38,8 @@ async def upload_md_file(
         project_id=project.id,
         public_url=public_url,
     )
+    print("File created")
+    print(file.filename)
 
     return {
         "filename": new_file.filename,

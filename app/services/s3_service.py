@@ -18,6 +18,7 @@ s3_client = boto3.client(
 
 async def upload_file_to_s3(file_obj, bucket_name: str, object_name: str, content_type: str | None = None):
     file_obj.seek(0)  # важно!
+    print("Start upload file to s3")
     extra = {}
     if content_type:
      extra["ContentType"] = content_type
