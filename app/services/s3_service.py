@@ -17,7 +17,10 @@ s3_client = boto3.client(
 )
 
 async def upload_file_to_s3(file_obj, bucket_name: str, object_name: str, content_type: str | None = None):
-    print(s3_client.list_buckets())
+    print(MINIO_ENDPOINT)
+    print(MINIO_KEY_ID)
+    print(MINIO_APPLICATION_KEY)
+
     print("KEY_ID:", MINIO_KEY_ID[:4], "...", MINIO_APPLICATION_KEY[-4:])
     file_obj.seek(0)  # важно!
     extra = {}
