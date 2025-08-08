@@ -16,6 +16,7 @@ GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 JWT_SECRET = os.getenv("JWT_SECRET")
 SESSION_SECRET_KEY = os.getenv("SESSION_SECRET_KEY")
+FRIENDLY_URL = os.getenv("FRIENDLY_URL")
 
 # Тестовый токен и пользователь для упрощённой авторизации
 TEST_AUTH_TOKEN = os.getenv("TEST_AUTH_TOKEN")

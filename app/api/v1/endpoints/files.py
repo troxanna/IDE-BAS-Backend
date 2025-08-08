@@ -1,7 +1,7 @@
 from fastapi import APIRouter, File, UploadFile, HTTPException, Depends, Form, Query
 from app.services.s3_service import upload_file_to_s3
 from app.core.security import get_current_user
-from app.core.config import MINIO_ENDPOINT
+from app.core.config import MINIO_ENDPOINT, FRIENDLY_URL
 from app.models.user import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
@@ -24,8 +24,8 @@ async def upload_md_file(
     project = await get_or_create_project(db, project_name, current_user.id)
     bucket_name = "files-uploads"
     try:
-        await upload_file_to_s3(file.file, bucket_name, file.filename)
-        public_url = f"{MINIO_ENDPOINT}/{bucket_name}/{file.filename}"
+        await upload_file_to_s3(file.file, "files-uploads", file.filename, content_type=file.content_type)
+        public_url = f"{FRIENDLY_URL}/{bucket_name}/{file.filename}"
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error uploading to S3: {e}")
 
