@@ -10,15 +10,16 @@ from app.core.config import MINIO_ENDPOINT, MINIO_KEY_ID, MINIO_APPLICATION_KEY
 s3_client = boto3.client(
     's3',
     endpoint_url=MINIO_ENDPOINT,
-    aws_access_key_id=MINIO_KEY_ID,
-    aws_secret_access_key=MINIO_APPLICATION_KEY,
+    aws_access_key_id=MINIO_KEY_ID.strip(),
+    aws_secret_access_key=MINIO_APPLICATION_KEY.strip(),
     region_name='us-east-005',
     config=Config(signature_version="s3v4", s3={"addressing_style": "virtual"}),
 )
 
 async def upload_file_to_s3(file_obj, bucket_name: str, object_name: str, content_type: str | None = None):
+    print(s3_client.list_buckets())
+    print("KEY_ID:", MINIO_KEY_ID[:4], "...", MINIO_APPLICATION_KEY[-4:])
     file_obj.seek(0)  # важно!
-    print("Start upload file to s3")
     extra = {}
     if content_type:
      extra["ContentType"] = content_type
