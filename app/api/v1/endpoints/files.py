@@ -8,6 +8,7 @@ from app.db.session import get_db
 from app.db.repository.project import get_or_create_project, get_user_project_by_name
 from app.db.repository.file import create_file, get_user_files_by_project_name
 from typing import List, Optional
+from pathlib import Path
 
 router = APIRouter()
 
@@ -18,8 +19,14 @@ async def upload_md_file(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    if file.content_type != "text/markdown" and not file.filename.endswith(".md"):
-        raise HTTPException(status_code=400, detail="Invalid file type. Please upload a Markdown (.md) file.")
+    allowed_extensions = {".md", ".puml", ".png", ".svg"}
+    file_extension = Path(file.filename).suffix.lower()
+
+    if file_extension not in allowed_extensions:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid file type. Allowed: Markdown (.md), PlantUML (.puml), PNG (.png), SVG (.svg)."
+        )
 
     project = await get_or_create_project(db, project_name, current_user.id)
     project_name_value = project.name
