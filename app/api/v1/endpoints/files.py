@@ -12,7 +12,7 @@ from pathlib import Path
 
 router = APIRouter()
 
-@router.post("/")
+@router.post("")
 async def upload_md_file(
     file: UploadFile = File(...),
     project_name: str = Form(...),
@@ -56,7 +56,7 @@ async def upload_md_file(
     }
 
 
-@router.get("/", response_model=List[str])
+@router.get("", response_model=List[str])
 async def list_user_files(
     project_name: Optional[str] = Query(default=None),
     current_user: User = Depends(get_current_user),
