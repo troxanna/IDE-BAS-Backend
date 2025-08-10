@@ -4,7 +4,6 @@ from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from app.models.project import Project
 import uuid
 
 from app.db.base import Base
@@ -25,3 +24,13 @@ class File(Base):
 
     project_id = Column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"))
     project = relationship("Project", back_populates="files")
+
+    @property
+    def project_name(self) -> str | None:
+        return self.project.name if self.project else None
+
+
+class FileBrief(Base):
+    filename: str
+    public_url: str
+    project: str  # имя проекта

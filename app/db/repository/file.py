@@ -5,6 +5,7 @@ from app.models.project import Project
 from typing import Optional, List
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
+import uuid
 
 
 async def create_file(
@@ -31,21 +32,20 @@ async def create_file(
     return new_file
 
 
+
 async def get_user_files_by_project_name(
     db: AsyncSession,
-    user_id: str,                 # проверь, не int ли у тебя на самом деле
-    project_name: Optional[str],  # теперь опционально
+    user_id: uuid.UUID,                      # или str — как у тебя в модели
+    project_name: Optional[str],
 ) -> List[File]:
     stmt = (
         select(File)
-        .join(File.project)                       # join по ORM-отношению
-        .where(Project.user_id == user_id)        # только проекты текущего пользователя
-        # .where(File.is_public.is_(True))        # раскомментируй, если нужны только публичные
-        .options(selectinload(File.project))      # подгружаем проект, чтобы не было N+1
+        .join(File.project)
+        .where(Project.user_id == user_id)
+        .options(selectinload(File.project))   # чтобы f.project.name не делал N+1
         .order_by(File.created_at.desc())
     )
-
-    if project_name:                               # фильтр по имени проекта — только если задан
+    if project_name:
         stmt = stmt.where(Project.name == project_name)
 
     result = await db.execute(stmt)
