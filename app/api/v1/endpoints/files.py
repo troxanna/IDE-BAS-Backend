@@ -1,7 +1,7 @@
 from fastapi import APIRouter, File, UploadFile, HTTPException, Depends, Form, Query
 from app.services.s3_service import upload_file_to_s3
 from app.core.security import get_current_user
-from app.core.config import MINIO_ENDPOINT, FRIENDLY_URL
+from app.core.config import FRIENDLY_URL
 from app.models.user import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
@@ -58,17 +58,29 @@ async def upload_md_file(
     }
 
 
+from typing import Optional, List
+from fastapi import Query, Depends, HTTPException
+import logging
+
+logger = logging.getLogger(__name__)
+
 @router.get("", response_model=List[str])
 async def list_user_files(
-    project_name: str = Query(...), 
+    project_name: Optional[str] = Query(None),  # теперь параметр необязателен
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    project = await get_user_project_by_name(db, user_id=current_user.id, name=project_name)
-    if not project:
-        raise HTTPException(status_code=404, detail=f"Project '{project_name}' not found")
+    # Если проект указан — проверяем, что он существует
+    if project_name:
+        project = await get_user_project_by_name(db, user_id=current_user.id, name=project_name)
+        if not project:
+            raise HTTPException(status_code=404, detail=f"Project '{project_name}' not found")
 
-    files = await get_user_files_by_project_name(db, user_id=current_user.id, project_name=project_name)
+    # Запрашиваем файлы (функция сама обработает None в project_name)
+    files = await get_user_files_by_project_name(
+        db, user_id=current_user.id, project_name=project_name
+    )
+
     public_urls = [f.public_url for f in files if f.public_url]
     logger.debug(f"Public URLs: {public_urls}")
 
