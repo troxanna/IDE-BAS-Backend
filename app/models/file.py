@@ -28,9 +28,3 @@ class File(Base):
     @property
     def project_name(self) -> str | None:
         return self.project.name if self.project else None
-
-
-class FileBrief(Base):
-    filename: str
-    public_url: str
-    project: str  # имя проекта
