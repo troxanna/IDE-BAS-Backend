@@ -4,6 +4,7 @@ from app.models.file import File
 from app.models.project import Project
 from typing import Optional
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 
 
 async def create_file(
@@ -30,11 +31,18 @@ async def create_file(
     return new_file
 
 
-async def get_user_files_by_project_name(db: AsyncSession, user_id: str, project_name: Optional[str]):
-    stmt = select(File).join(Project).where(Project.user_id == user_id, File.is_public == True)
-
-    if project_name:
-        stmt = stmt.where(Project.name == project_name)
-
+async def get_user_files_by_project_name(
+    db: AsyncSession,
+    user_id: str,
+    project_name: str,
+):
+    stmt = (
+        select(File)
+        .join(File.project)  # явный join по отношению
+        .where(Project.user_id == user_id)
+        .where(Project.name == project_name)
+        .where(File.is_public.is_(True))
+        .order_by(File.created_at.desc())     # если есть поле и нужна сортировка
+    )
     result = await db.execute(stmt)
     return result.scalars().all()

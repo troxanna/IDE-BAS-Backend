@@ -9,7 +9,9 @@ from app.db.repository.project import get_or_create_project, get_user_project_by
 from app.db.repository.file import create_file, get_user_files_by_project_name
 from typing import List, Optional
 from pathlib import Path
+import logging
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 @router.post("")
@@ -58,15 +60,16 @@ async def upload_md_file(
 
 @router.get("", response_model=List[str])
 async def list_user_files(
-    project_name: Optional[str] = Query(default=None),
+    project_name: str = Query(...), 
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    if project_name:
-        project = await get_user_project_by_name(db, user_id=current_user.id, name=project_name)
-        if not project:
-            raise HTTPException(status_code=404, detail=f"Project '{project_name}' not found")
+    project = await get_user_project_by_name(db, user_id=current_user.id, name=project_name)
+    if not project:
+        raise HTTPException(status_code=404, detail=f"Project '{project_name}' not found")
 
     files = await get_user_files_by_project_name(db, user_id=current_user.id, project_name=project_name)
     public_urls = [f.public_url for f in files if f.public_url]
+    logger.debug(f"Public URLs: {public_urls}")
+
     return public_urls
