@@ -41,7 +41,7 @@ async def get_user_files_by_project_name(
         .join(File.project)  # явный join по отношению
         .where(Project.user_id == user_id)
         .where(Project.name == project_name)
-        .where(File.is_public.is_(True))
+        # .where(File.is_public.is_(True))
         .order_by(File.created_at.desc())     # если есть поле и нужна сортировка
     )
     result = await db.execute(stmt)
