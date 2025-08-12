@@ -7,7 +7,8 @@
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:8000/api/v1" },
-    { "key": "token", "value": "" }
+    { "key": "token", "value": "" },
+    { "key": "project_name", "value": "" }
   ],
   "item": [
     {
@@ -88,6 +89,28 @@
               "path": ["files"],
               "query": [
                 { "key": "project_name", "value": "" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Share Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{project_name}}/share?user_email=",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "{{project_name}}", "share"],
+              "query": [
+                { "key": "user_email", "value": "" }
               ]
             }
           }

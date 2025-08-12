@@ -1,10 +1,11 @@
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid
 
 from app.db.base import Base
+
 
 class User(Base):
     __tablename__ = "users"
@@ -17,3 +18,6 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     projects = relationship("Project", back_populates="user", cascade="all, delete")
+    project_accesses = relationship(
+        "ProjectAccess", back_populates="user", cascade="all, delete-orphan"
+    )
