@@ -1,9 +1,8 @@
 # app/models/project.py
 
 import uuid
-from datetime import datetime
 
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -18,3 +17,6 @@ class Project(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     user = relationship("User", back_populates="projects")
     files = relationship("File", back_populates="project", cascade="all, delete")
+    accesses = relationship(
+        "ProjectAccess", back_populates="project", cascade="all, delete-orphan"
+    )

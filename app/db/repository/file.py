@@ -1,11 +1,14 @@
 # file.py
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.file import File
-from app.models.project import Project
-from typing import Optional, List
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
+from sqlalchemy import or_
 import uuid
+from typing import List, Optional
+
+from app.models.file import File
+from app.models.project import Project
+from app.models.project_access import ProjectAccess
 
 
 async def create_file(
@@ -41,8 +44,9 @@ async def get_user_files_by_project_name(
     stmt = (
         select(File)
         .join(File.project)
-        .where(Project.user_id == user_id)
-        .options(selectinload(File.project))   # чтобы f.project.name не делал N+1
+        .outerjoin(ProjectAccess, ProjectAccess.project_id == Project.id)
+        .where(or_(Project.user_id == user_id, ProjectAccess.user_id == user_id))
+        .options(selectinload(File.project))  # чтобы f.project.name не делал N+1
         .order_by(File.created_at.desc())
     )
     if project_name:
