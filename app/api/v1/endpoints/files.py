@@ -73,6 +73,6 @@ async def list_user_files(
     files = await get_user_files_by_project_name(db, user_id=current_user.id, project_name=project_name)
 
     # Можно логировать кратко
-    logger.debug("Files count=%d, project=%s", len(files), project_name or "*")
+    # logger.debug("Files count=%d, project=%s", len(files), project_name or "*")
 
     return files  # FastAPI + Pydantic сами превратят ORM в нужный JSON
